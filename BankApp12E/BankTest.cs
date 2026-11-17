@@ -14,8 +14,8 @@ namespace BankApp12E
         public void SetUp()
         {
             bank = new Bank();
-            bank.CreateAccount("1234");
-            bank.CreateAccount("5678");
+            bank.CreateAccount("1234", "Gipsz Jakab");
+            bank.CreateAccount("5678", "Koczka István");
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace BankApp12E
         [Test]
         public void DepositMultipleAccounts()
         {
-            
+
             bank.Deposit("1234", 10000);
             Assert.That(bank.GetBalance("1234"), Is.EqualTo(10000));
             Assert.That(bank.GetBalance("5678"), Is.Zero);
@@ -81,7 +81,7 @@ namespace BankApp12E
         [Test]
         public void WithdrawTooMuch()
         {
-            Assert.That(bank.Withdraw("1234", 10000),Is.False);
+            Assert.That(bank.Withdraw("1234", 10000), Is.False);
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace BankApp12E
         {
             bank.Deposit("1234", 10000);
             Assert.That(bank.Withdraw("1234", 1000), Is.True);
-            Assert.That(bank.GetBalance("1234"),Is.EqualTo(9000));
+            Assert.That(bank.GetBalance("1234"), Is.EqualTo(9000));
         }
 
 
@@ -97,9 +97,9 @@ namespace BankApp12E
         public void TransferAccountsValid()
         {
             bank.Deposit("1234", 10000);
-            Assert.That(()=>bank.Transfer("1234","56789",1000),Throws.TypeOf<ArgumentException>());
-            Assert.That(()=>bank.Transfer("12345","5678",1000),Throws.TypeOf<ArgumentException>());
-            Assert.That(()=>bank.Transfer("1234","1234",1000),Throws.TypeOf<ArgumentException>());
+            Assert.That(() => bank.Transfer("1234", "56789", 1000), Throws.TypeOf<ArgumentException>());
+            Assert.That(() => bank.Transfer("12345", "5678", 1000), Throws.TypeOf<ArgumentException>());
+            Assert.That(() => bank.Transfer("1234", "1234", 1000), Throws.TypeOf<ArgumentException>());
             Assert.That(bank.GetBalance("1234"), Is.EqualTo(10000));
         }
         [Test]
@@ -114,7 +114,7 @@ namespace BankApp12E
         public void TransferAmountIsPossible()
         {
             bank.Deposit("1234", 10000);
-            Assert.That(bank.Transfer("1234", "5678", 11000),Is.False);
+            Assert.That(bank.Transfer("1234", "5678", 11000), Is.False);
             Assert.That(bank.GetBalance("1234"), Is.EqualTo(10000));
             Assert.That(bank.GetBalance("5678"), Is.EqualTo(0));
         }
@@ -132,7 +132,7 @@ namespace BankApp12E
         public void GetBalanceOfClosedAccount()
         {
             bank.CloseAccount("1234");
-            Assert.That(()=> bank.GetBalance("1234"),Throws.TypeOf<ArgumentException>());
+            Assert.That(() => bank.GetBalance("1234"), Throws.TypeOf<ArgumentException>());
         }
         [Test]
         public void CloseAccountWithBalance()
@@ -144,6 +144,35 @@ namespace BankApp12E
         public void CloseAccountWithInvalidId()
         {
             Assert.That(() => bank.CloseAccount("2345"), Throws.TypeOf<ArgumentException>());
+        }
+
+
+        [Test]
+        public void newAccountWithSameName()
+        {
+            Assert.That(bank.CreateAccount("8153", "Gipsz Jakab"),Is.False);
+        }
+        [Test]
+        public void IdCheck()
+        {
+            Assert.That(() => bank.CreateAccount("1234","Nagy Endre"), Throws.TypeOf<ArgumentException>());
+        }
+
+        [Test]
+        public void newAccount()
+        {
+            Assert.That(bank.CreateAccount("8153", "Nagy Endre"), Is.True);
+        }
+
+        [Test]
+        public void GetOwnerOfNonExistantAccount()
+        {
+            Assert.That(bank.GetOwner("3465"), Is.Null);
+        }
+        [Test]
+        public void GetOwner()
+        {
+            Assert.That(bank.GetOwner("1234"), Is.EqualTo("Gipsz Jakab"));
         }
     }
 }

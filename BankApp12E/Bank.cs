@@ -4,11 +4,23 @@ namespace BankApp12E
 {
     public class Bank
     {
-        public Dictionary<string, int> accounts = new Dictionary<string, int>();
+        Dictionary<string, Account> accounts = new Dictionary<string, Account>();
 
-        public void CreateAccount(string account)
+        public bool CreateAccount(string account,string name)
         {
-            accounts.Add(account, 0);
+            if (accounts.ContainsKey(account))
+            {
+                throw new ArgumentException("There is already an account to this Id");
+            }
+            foreach (var item in accounts) 
+            { 
+                if (item.Value.Name == name)
+                {
+                    return false;
+                }
+            }
+            accounts.Add(account, new Account(name));
+            return true;
         }
 
         public int GetBalance(string account)
@@ -17,7 +29,7 @@ namespace BankApp12E
             {
                 throw new ArgumentException("Invalid account");
             }
-            return accounts[account];
+            return accounts[account].Balance;
         }
 
         public void Deposit(string account, int amount)
@@ -30,7 +42,7 @@ namespace BankApp12E
             {
                 throw new ArgumentException("Invalid amount");
             }
-            accounts[account] += amount;
+            accounts[account].Balance += amount;
         }
         public bool Withdraw(string account, int amount) 
         {
@@ -42,11 +54,11 @@ namespace BankApp12E
             {
                 throw new ArgumentException("Invalid amount");
             }
-            if (accounts[account] < amount) 
+            if (accounts[account].Balance < amount) 
             {
                 return false;
             }
-            accounts[account]-=amount;
+            accounts[account].Balance-=amount;
             return true;
         }
 
@@ -60,10 +72,10 @@ namespace BankApp12E
             {
                 throw new ArgumentException("Invalid amount");
             }
-            if (accounts[fromAccount] >= amount)
+            if (accounts[fromAccount].Balance >= amount)
             {
-                accounts[fromAccount] -= amount;
-                accounts[toAccount] += amount;
+                accounts[fromAccount].Balance -= amount;
+                accounts[toAccount].Balance += amount;
                 return true;
             }
             return false;
@@ -75,11 +87,20 @@ namespace BankApp12E
             { 
                 throw new ArgumentException("Invalid account");
             }
-            if (accounts[account] > 0) 
+            if (accounts[account].Balance > 0) 
             {
                 throw new InvalidOperationException("You cant close an account with a balance");
             }
             accounts.Remove(account);
+        }
+
+        public string GetOwner(string account)
+        {
+            if (!accounts.ContainsKey(account))
+            {
+                return null;
+            }
+            return (accounts[account].Name);
         }
     }
 }
